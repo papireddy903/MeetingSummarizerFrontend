@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 const InputForm = () => {
   const [prompt, setPrompt] = useState("");
@@ -63,17 +64,13 @@ const InputForm = () => {
 
         {showSummary && (
           <>
-            <label className="mb-2 font-semibold">Generated Summary (Editable)</label>
+            <label className="mb-2 font-semibold">Generated Summary</label>
             {loading ? (
               <div className="animate-pulse h-40 bg-gray-200 rounded-md mb-6"></div>
             ) : (
-              <textarea
-                rows="12"
-                placeholder="Your AI-generated summary will appear here..."
-                value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                className="mb-6 px-4 py-3 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-              ></textarea>
+              <div className="prose bg-gray-50 p-4 rounded-md shadow-md max-h-96 overflow-y-auto">
+                <ReactMarkdown>{summary}</ReactMarkdown>
+              </div>
             )}
           </>
         )}
