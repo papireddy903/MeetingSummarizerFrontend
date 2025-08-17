@@ -5,6 +5,8 @@ const InputForm = () => {
   const [summary, setSummary] = useState("");
   const [email, setEmail] = useState("");
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
@@ -15,6 +17,10 @@ const InputForm = () => {
       alert("Please upload a file first!");
       return;
     }
+
+    setLoading(true);
+    setShowSummary(true);
+    setSummary("");
 
     const formData = new FormData();
     formData.append("file", file);
@@ -30,6 +36,9 @@ const InputForm = () => {
       setSummary(data.summary);
     } catch (error) {
       console.error("Error:", error);
+      setSummary("⚠️ Failed to generate summary. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -43,6 +52,7 @@ const InputForm = () => {
           className="mb-6"
           onChange={handleFileChange}
         />
+
         <label className="mb-2 font-semibold">Custom Instructions/Prompt</label>
         <input
           type="text"
@@ -51,15 +61,22 @@ const InputForm = () => {
           onChange={(e) => setPrompt(e.target.value)}
         />
 
-
-        <label className="mb-2 font-semibold">Generated Summary (Editable)</label>
-        <textarea
-          rows="12"
-          placeholder="Your AI-generated summary will appear here..."
-          value={summary}
-          onChange={(e) => setSummary(e.target.value)}
-          className="mb-2 px-4 py-3 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
-        ></textarea>
+        {showSummary && (
+          <>
+            <label className="mb-2 font-semibold">Generated Summary (Editable)</label>
+            {loading ? (
+              <div className="animate-pulse h-40 bg-gray-200 rounded-md mb-6"></div>
+            ) : (
+              <textarea
+                rows="12"
+                placeholder="Your AI-generated summary will appear here..."
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                className="mb-6 px-4 py-3 rounded-md shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
+              ></textarea>
+            )}
+          </>
+        )}
 
         <label className="mb-2 font-semibold">Recipient Email</label>
         <input
@@ -74,8 +91,9 @@ const InputForm = () => {
         <button
           onClick={handleGenerate}
           className="bg-blue-600 text-white px-6 py-2 rounded-md shadow hover:bg-blue-700 transition"
+          disabled={loading}
         >
-          Generate Summary
+          {loading ? "Generating..." : "Generate Summary"}
         </button>
         <button className="bg-green-600 text-white px-6 py-2 rounded-md shadow hover:bg-green-700 transition">
           Share via Email
